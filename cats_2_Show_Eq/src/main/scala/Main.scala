@@ -75,7 +75,6 @@ object Main extends App {
     }
 
   val cat11 = Cat("Garfield",   38,"orangeandblack")
-
   val cat22 = Cat("Heathcliff", 32,"orangeandblack")
 
   println(cat11 === cat22)
@@ -90,4 +89,5 @@ object Main extends App {
   println(optionCat11 === optionCat22)
   println(List(1,2,3) === List(1,2,4))
   println(List("один","два") =!= List("один","три"))
+
 }
