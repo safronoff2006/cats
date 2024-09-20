@@ -81,9 +81,13 @@ object Main extends App {
   println(cat11 === cat22)
   println(cat11 =!= cat22)
 
+
   val optionCat11 = Option(cat1)
   val optionCat22 = Option.empty[Cat]
 
-  println(optionCat11 === optionCat22)
 
+
+  println(optionCat11 === optionCat22)
+  println(List(1,2,3) === List(1,2,4))
+  println(List("один","два") =!= List("один","три"))
 }
