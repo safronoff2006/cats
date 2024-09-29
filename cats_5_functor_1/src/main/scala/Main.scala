@@ -2,14 +2,13 @@
 
 
 import cats._
+import cats.implicits._
+//import cats.instances.all._
+//import cats.syntax.all._
 
-import scala.annotation.tailrec
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 import scala.language.postfixOps
-//import cats.implicits._
-import cats.instances.all._
-import cats.syntax.all._
 
 
 object Main extends App {
@@ -157,7 +156,130 @@ object Main extends App {
     }
   }
 
+  object block_3 {
+    def cotrvariant_functor_1(): Unit = {
+
+      ////////////  тайп класс Display ////////////////////////////
+
+      //1 тайп класс
+      trait Display[A] {self =>
+
+        def display(value: A): String
+
+        /*
+        def contramap[B](func: B => A): Display[B] =
+          new Display[B] {
+            def display(value: B): String =
+              self.display(func(value))
+          }
+         */
+
+        def contramap[B](func: B => A): Display[B] = (value: B) => self.display(func(value))
+      }
+
+      //2 интерфейсный метод
+      def display[A](value: A)(implicit p: Display[A]): String = p.display(value)
+
+      //3 имплементации
+
+      implicit val stringDisplay: Display[String] = (value: String) => s"'$value'"
+
+      implicit val booleanDisplay: Display[Boolean] = (value: Boolean) => if (value) "yes" else "no"
+
+      implicit val intDisplay: Display[Int] = (value: Int) => s"#$value#"
+
+      println( display("hello") )
+      println( display(true) )
+
+      final case class Box[A](value: A)
+
+      /* обычная реализация интерфейсного метода
+      implicit def boxDisplay[A](implicit p: Display[A]): Display[Box[A]] =
+        (box: Box[A]) => p.display(box.value)
+      */
+
+      /* реализация через contrmap */
+      implicit def boxContrmapDisplay[A](implicit p: Display[A]):Display[Box[A]] =
+        p.contramap[Box[A]](_.value)
+
+      println( display(Box(123)))
+
+      ////////////// Тайп класс Codec ////////////////////////////
+
+      //1 Тайп класс
+      trait Codec[A] { self =>
+        def encode(value: A): String
+
+        def decode(value: String): A
+
+        def imap[B](dec: A => B, enc: B => A):Codec[B] = new Codec[B] {
+          override def encode(value: B): String = self.encode(enc(value))
+
+          override def decode(value: String): B = dec(self.decode(value))
+        }
+      }
+
+      //2 интерфейсные методы
+      def encode[A](value: A)(implicit c: Codec[A]): String = c.encode(value)
+      def decode[A](value: String)(implicit c: Codec[A]): A = c.decode(value)
+
+      //3 имплементации
+
+      implicit val stringCodec: Codec[String] = new Codec[String] {
+          override def encode(value: String): String = value
+          override def decode(value: String): String = value
+      }
+
+      implicit val intCodec: Codec[Int] = stringCodec.imap(_.toInt, _.toString)
+      implicit val booleanCodec: Codec[Boolean] = stringCodec.imap(_.toBoolean, _.toString)
+
+      println ( encode(123) )
+      println ( encode("Ну Погоди!"))
+      println ( encode(true) )
+
+      println (decode[String]("Йо!!!!"))
+      println (decode[Int]("12567"))
+      println (decode[Boolean]("FALSE"))
+
+      implicit val doubleCodec: Codec[Double] = stringCodec.imap[Double](_.toDouble, _.toString)
+      println ( encode(123.0) )
+      println ( decode[Double]("234.45"))
+
+      final case class Box2[A](value: A)
+      implicit def boxCodec[A](implicit c: Codec[A]): Codec[Box2[A]] = c.imap[Box2[A]](Box2(_), _.value)
+
+      println ( encode(Box2(123.4)) )
+      println ( decode[Box2[Double]]("123.4") )
+
+    }
+
+    def cotrvariant_functor_2(): Unit = {
+      val showString = Show[String]
+
+      val showSymbol = Contravariant[Show].contramap(showString)((sym:Symbol) => s"'${sym.name}'")
+
+      println ( showSymbol.show(Symbol("Жесть")))
+      println {
+        showString.contramap[Symbol](sym => s"'${sym.name}'").show(Symbol("От Бля!"))
+      }
+
+      implicit val symbolMonoid: Monoid[Symbol] = Monoid[String].imap(Symbol.apply)(_.name)
+
+      println( Monoid[Symbol].empty)
+
+      println {
+        Symbol("Да ") |+| Symbol(" здравствует ") |+| Symbol(" наш ") |+|
+          Symbol(" Карабас ") |+|   Symbol(" удалой")
+      }
+    }
+
+
+  }
+
   block_1.block_1()
   block_2.block_2()
+  block_3.cotrvariant_functor_1()
+  block_3.cotrvariant_functor_2()
+
 
 }
