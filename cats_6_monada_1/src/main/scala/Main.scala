@@ -360,27 +360,182 @@ object Main extends App {
   object part6 {
     def part6: Unit = {
       println("---------- MonadError -----------")
-
       /*
-
       package cats
-
       trait MonadError[F[_], E] extends Monad[F] {
-
           // Поднять ошибку в контекст `F`:
           def raiseError[A](e: E): F[A]
-
           // Обрабатывать ошибку, потенциально устраняя ее:
           def handleErrorWith[A](fa: F[A])(f: E => F[A]): F[A]
-
           // Обрабатывать все ошибки, восстанавливаясь после них:
           def handleError[A](fa: F[A])(f: E => A): F[A]
-
-          //Протестируйте экземпляр `F` с
-          //ошибкой, если предикат не удовлетворен:
+          //Протестируйте экземпляр `F` ошибкой, если предикат не удовлетворен:
           def ensure[A](fa: F[A])(e: E)(f: A => Boolean): F[A]
       }
        */
+
+      type ErrorOr[A] = Either[String, A]
+      val monadErrorE: MonadError[ErrorOr, String] = MonadError[ErrorOr, String]
+
+      val success1 = monadErrorE.pure(42)
+      val failure1 = monadErrorE.raiseError("ОШИБКА!")
+      val failure2 = monadErrorE.raiseError("Другая ОШИБКА!")
+      val success2 = monadErrorE.pure("да")
+
+      println {
+        success1
+      }
+
+      println {
+        failure1
+      }
+
+      println {
+        monadErrorE.handleErrorWith(failure1) {
+          case "ОШИБКА!" => monadErrorE.pure(666)
+          case _ => monadErrorE.raiseError("Fail!")
+        }
+      }
+
+      println("----------------")
+
+      import Default._
+
+      def handleEwith1[A](r: ErrorOr[A])(implicit default: Default[A]): ErrorOr[A] = monadErrorE.handleErrorWith(r) {
+        case "ОШИБКА!" => monadErrorE.pure(default.get)
+        case _ => monadErrorE.raiseError("Fail!")
+      }
+
+      def handleEwith2[A: Default](r: ErrorOr[A]): ErrorOr[A] = {
+        monadErrorE.handleErrorWith(r) {
+          case "ОШИБКА!" => monadErrorE.pure(implicitly[Default[A]].get)
+          case _ => monadErrorE.raiseError("Fail!")
+        }
+      }
+
+      def handleEwith3[A: Default](r: ErrorOr[A]): ErrorOr[A] = {
+        monadErrorE.handleErrorWith(r) {
+          case "ОШИБКА!" => monadErrorE.pure(Default[A].get)
+          case _ => monadErrorE.raiseError("Fail!")
+        }
+      }
+
+
+      println(handleEwith1[Int](success1))
+      println(handleEwith1[Int](failure1))
+      println(handleEwith1[String](failure2))
+      println(handleEwith1[String](success2))
+      println("----------------")
+
+      val success3 = monadErrorE.pure(true)
+      println(handleEwith1[Boolean](success3))
+      println(handleEwith1[Boolean](failure1))
+      println(handleEwith1[Boolean](failure2))
+
+      println("----------------")
+
+      println(handleEwith2[Int](success1))
+      println(handleEwith2[Int](failure1))
+      println(handleEwith2[String](failure2))
+      println(handleEwith2[String](success2))
+      println(handleEwith2[Boolean](success3))
+      println(handleEwith2[Boolean](failure1))
+      println(handleEwith2[Boolean](failure2))
+
+      println("----------------")
+
+      println(handleEwith3[Int](success1))
+      println(handleEwith3[Int](failure1))
+      println(handleEwith3[String](failure2))
+      println(handleEwith3[String](success2))
+      println(handleEwith3[Boolean](success3))
+      println(handleEwith3[Boolean](failure1))
+      println(handleEwith3[Boolean](failure2))
+
+
+    }
+  }
+
+  object part7 {
+    def part7: Unit = {
+
+      type ErrorOr[A] = Either[String, A]
+      val monadErrorE: MonadError[ErrorOr, String] = MonadError[ErrorOr, String]
+
+      val success1 = monadErrorE.pure(42)
+      val failure1 = monadErrorE.raiseError("ОШИБКА!")
+      val failure2 = monadErrorE.raiseError("Другая ОШИБКА!")
+      val success2 = monadErrorE.pure("да")
+      val success3 = monadErrorE.pure(true)
+      val success4 = monadErrorE.pure(5000)
+
+
+      println {
+        monadErrorE.handleError[Int](failure1) {
+          case "ОШИБКА!" => 42
+          case _ => -1
+        }
+      }
+
+      println {
+        monadErrorE.ensure[Int](success1)("Номер очень маленький")(_ > 1000)
+      }
+
+      println {
+        monadErrorE.handleErrorWith[Int](
+          monadErrorE.ensure[Int](success1)("Номер очень маленький")(_ > 1000)
+        ) {
+          case err => monadErrorE.raiseError(s"Вот такая ошибка: $err")
+        }
+      }
+
+      println("----------------")
+
+      val sucesss5: ErrorOr[Int] = 5000.pure[ErrorOr]
+      val failure5: ErrorOr[Int] = "ОШИБКА!".raiseError[ErrorOr, Int]
+
+      println {
+        sucesss5.ensure("Номер очень маленький")(_ > 1000)
+      }
+
+      println {
+        failure5.ensure("Номер очень маленький")(_ > 1000)
+      }
+
+      println("----------------")
+
+      type ErrorTr[A] = Try[A]
+      val monadErrorT: MonadError[ErrorTr, Throwable] = MonadError[ErrorTr, Throwable]
+
+      val exn: Throwable = new RuntimeException("Пользовательское исключение!")
+
+      println {
+        exn.raiseError[ErrorTr, Int]
+      }
+
+      println {
+        45.pure[ErrorTr]
+      }
+
+      println("----------------")
+
+      type ErrorFu[A] = Future[A]
+      val monadErrorF: MonadError[ErrorFu, Throwable] = MonadError[ErrorFu, Throwable]
+
+      val future1 = exn.raiseError[ErrorFu, Int]
+
+      future1.onComplete {
+        case Failure(exc) => println(exc.getMessage)
+        case Success(value) => println(value)
+      }
+
+      val future2 = 100.pure[ErrorFu]
+
+      future2.onComplete {
+        case Failure(exc) => println(exc.getMessage)
+        case Success(value) => println(value)
+      }
+
 
     }
   }
@@ -389,6 +544,7 @@ object Main extends App {
   //part3.part3
   //part4.part4
   //part5.part5
-  part6.part6
+  //part6.part6
+  part7.part7
 
 }
