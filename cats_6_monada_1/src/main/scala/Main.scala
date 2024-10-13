@@ -540,11 +540,153 @@ object Main extends App {
     }
   }
 
+  object part8 {
+    def part8: Unit = {
+      //валидатор
+      def validateAdult[F[_]](age: Int)(implicit me: MonadError[F, Throwable]): F[Int] =
+        if (age >= 18) age.pure[F]
+        else new IllegalArgumentException("Только после 18 лет").raiseError[F, Int]
+
+      println {
+        validateAdult[Try](18)
+      }
+      println {
+        validateAdult[Try](10)
+      }
+
+      type ExceptionOr[A] = Either[Throwable, A]
+
+      println {
+        validateAdult[ExceptionOr](-1)
+      }
+      println {
+        validateAdult[ExceptionOr](40)
+      }
+      println("----------------")
+
+      def validate[F[_], A](p: A)(f: A => Boolean)(implicit mt: MonadError[F, Throwable]): F[A] = {
+        if (f(p)) p.pure[F]
+        else new IllegalArgumentException(s"Параметр ${p.toString} не удовлетворяет условию проверки")
+          .raiseError[F, A]
+      }
+
+      println {
+        validate[Try, Int](10)(_ >= 18)
+      }
+      println {
+        validate[Try, Int](30)(_ >= 18)
+      }
+
+
+      println("----------------")
+
+      def validatePassword(pass: String): ExceptionOr[String] = validate[ExceptionOr, String](pass)(_.length >= 10)
+
+      def validatePassword2(pass: String): Try[String] = validate[Try, String](pass)(_.length >= 10)
+
+      val password1 = "mutabor"
+      val password2 = "mutabormutabor"
+      val password3 = "mutabor"
+      println {
+        validatePassword(password1);
+      }
+      println {
+        validatePassword(password2);
+      }
+      println {
+        validatePassword2(password1);
+      }
+      println {
+        validatePassword2(password2);
+      }
+
+      validatePassword2(password3) match {
+        case Failure(exc) => println(s"Ошибка валидации: ${exc.getMessage}")
+        case Success(value) => println(s"Password: $value")
+      }
+
+    }
+  }
+
+  object part9 {
+    //домен ошибок
+    def part9: Unit = {
+
+      abstract class CustomError(message: String) extends RuntimeException(message) {
+        self =>
+        override def toString: String = self match {
+          case OtherError(m) => s"Другая ошибка ($m)"
+          case TypeError(m) => s"Ошибка типа($m)"
+          case ValueError(m) => s"Ошибка значения ($m)"
+          case _ => s"Неизвестная ошибка ${self.getMessage}"
+        }
+      }
+
+      case class OtherError(m: String) extends CustomError(m)
+      case class TypeError(m: String) extends CustomError(m)
+      case class ValueError(m: String) extends CustomError(m)
+
+      type CustomErrorOr[A] = Either[CustomError, A]
+
+      type MonadCustomErrorE = MonadError[CustomErrorOr, CustomError]
+      type MonadCustomErrorT = MonadError[Try, Throwable]
+
+
+      val success1: CustomErrorOr[Int] = 42.pure[CustomErrorOr]
+      val failure1: CustomErrorOr[Int] = OtherError("бла бла").raiseError[CustomErrorOr, Int]
+
+      println {
+        success1
+      }
+      println {
+        failure1
+      }
+
+      val success2: Try[Int] = 42.pure[Try]
+      val failure2 = TypeError("ох").raiseError[Try, Int]
+
+      println {
+        success2
+      }
+      println {
+        failure2
+      }
+
+      println("----------------")
+
+
+      def validate[A](p: A)(f: A => Boolean): CustomErrorOr[A] = {
+        if (f(p)) p.pure[CustomErrorOr]
+        else ValueError(s"Параметр ${p.toString} не удовлетворяет условию проверки").raiseError[CustomErrorOr, A]
+      }
+
+
+      def validatePassword(pass: String): CustomErrorOr[String] = validate[String](pass)(_.length >= 10)
+
+
+      val password = "йух"
+
+      validatePassword(password) match {
+        case Left(err) => err match {
+          case OtherError(m) => println(s"OtherError $m")
+          case TypeError(m) => println(s"TypeError $m")
+          case ValueError(m) => println(s"ValueError $m")
+          case _ => println(err)
+        }
+        case Right(pass) => println(s"Корректный пароль: $pass")
+      }
+
+
+    }
+  }
+
   //part1.part1
   //part3.part3
   //part4.part4
   //part5.part5
   //part6.part6
-  part7.part7
+  //part7.part7
+  //part8.part8
+  part9.part9
 
 }
