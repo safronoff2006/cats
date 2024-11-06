@@ -216,15 +216,25 @@ object Main extends App {
           _ <- Vector(s"fact $n val=${ans._1} dur=${ans._2}").tell
         } yield ans._1
 
-      val result: Vector[Vector[String]] = Await.result(
+      val result1: Vector[Vector[String]] = Await.result(
         Future.sequence(Vector(
           Future(factorialWR(5)),
-          Future(factorialWR(5))
+          Future(factorialWR(6))
         )).map(_.map(_.written))
         , 5 seconds
       )
 
-      println(result)
+      println(result1)
+
+      val result2: Vector[(Vector[String], Int)] =  Await.result(
+        Future.sequence(Vector(
+          Future(factorialWR(5)),
+          Future(factorialWR(6))
+        )).map(_.map(_.run))
+        , 5 seconds
+      )
+
+      println(result2)
 
     }
   }
