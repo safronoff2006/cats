@@ -1,4 +1,5 @@
 import sbt.Keys.{name, organization}
+
 // The simplest possible sbt build file is just one line:
 
 lazy val root = (project in file(".")).
@@ -27,8 +28,11 @@ lazy val root = (project in file(".")).
     scalacOptions ++= Seq("-Xfatal-warnings"),
     name := "Monada"
 
+
+
   )
 
+addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.3" cross CrossVersion.full)
 
 
 // lazy val root = (project in file(".")).
