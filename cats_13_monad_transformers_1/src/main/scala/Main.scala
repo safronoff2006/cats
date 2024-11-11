@@ -633,6 +633,54 @@ object Main extends App {
       // Напишите второй метод, canSpecialMove который принимает имена двух союзников и проверяет,
       // возможен ли специальный ход. Если какой-либо союзник недоступен, выдайте сообщение об ошибке:
 
+      /*
+        def canSpecialMove(ally1: String, ally2: String): Response[Boolean] =???
+      */
+
+      def canSpecialMove(ally1: String, ally2: String): Response[Boolean] =
+        for {
+          power1 <- getPowerLevel(ally1)
+          power2 <- getPowerLevel(ally2)
+        } yield (power1 + power2) > 15
+
+
+      // Наконец, напишите метод tacticalReport, который берет два имени союзников и выводит сообщение о том,
+      // могут ли они выполнить специальный прием:
+
+      /*
+        def tacticalReport(ally1: String, ally2: String): String =???
+      */
+
+      def tacticalReport(ally1: String, ally2: String): String = {
+        val stack = canSpecialMove(ally1, ally2).value
+
+        Await.result(stack, 1.second) match {
+          case Left(msg) =>
+            s"Comms error: $msg"
+          case Right(true)  =>
+            s"$ally1 and $ally2 are ready to roll out!"
+          case Right(false) =>
+            s"$ally1 and $ally2 need a recharge."
+        }
+      }
+
+      println{
+        tacticalReport("Jazz", "Bumblebee")
+        // res13: String = "Jazz and Bumblebee need a recharge."
+      }
+      println{
+        tacticalReport("Bumblebee", "Hot Rod")
+        // res14: String = "Bumblebee and Hot Rod are ready to roll out!"
+      }
+      println{
+        tacticalReport("Jazz", "Ironhide")
+        // res15: String = "Comms error: Ironhide unreachable"
+      }
+
+
+
+
+
     }
   }
 
@@ -643,4 +691,25 @@ object Main extends App {
   //part5.part5
   part6.part6
 
+
 }
+
+//  Резюме
+
+// В этой главе мы познакомились с преобразователями монад,
+// которые устраняют необходимость во вложенных включениях и сопоставлении с образцом при работе со «стеками» вложенных монад.
+
+// Каждый преобразователь монад, такой как FutureT, OptionT или EitherT, предоставляет код,
+// необходимый для слияния его связанной монады с другими монадами.
+// Трансформатор — это структура данных, которая оборачивает стек монад,
+// снабжая его map и flatMap методами,
+// которые распаковывают и переупаковывают весь стек.
+
+// Сигнатуры типов монад-трансформеров записываются изнутри наружу,
+// поэтому EitherT[Option, String, A] является оберткой для Option[Either[String, A]].
+// Часто бывает полезно использовать псевдонимы типов при написании типов трансформаторов для глубоко вложенных монад.
+
+// С этим взглядом на монадные трансформаторы мы теперь охватили все,
+// что нам нужно знать о монадах и последовательности вычислений с использованием flatMap.
+// В следующей главе мы сменим тактику и обсудим два новых класса типов, Semigroupal и Applicative,
+// которые поддерживают новые виды операций, такие как zipping независимые значения в контексте.
