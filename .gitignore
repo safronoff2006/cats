@@ -4,5 +4,6 @@
 */project/
 *mv.db
 *.log
+*target*
 
 
