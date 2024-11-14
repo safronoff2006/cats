@@ -1,0 +1,30 @@
+https://typelevel.org/cats/datatypes/kleisli.html
+
+https://habr.com/ru/articles/445488/  Монады с точки зрения программистов (и немного теории категорий)
+
+https://blog.softwaremill.com/kleisli-category-from-theory-to-cats-fbd140bf396e  Kleisli Category — From theory to Cats
+
+https://github.com/lu4nm3/scala-lessons/blob/master/src/main/scala/_4_functional_programming_monads/lesson4_7_kleisli.md
+
+
+https://sanj.ink/
+
+
+https://github.com/ssanj/kleisli/tree/master/src/main/scala/net/ssanj   Репозиторий индуса
+
+https://sanj.ink/posts/2017-06-07-composing-monadic-functions-with-kleisli-arrows.html Composing Monadic Functions with Kleisli Arrows
+
+
+
+
+
+
+https://medium.com/@supermanue/understanding-kleisli-in-scala-9c42ec1a5977 Understanding Kleisli in Scala
+
+https://medium.com/@supermanue/real-world-applications-of-scala-kleisli-dependency-injection-36ef589ee77b  Real world applications of Scala Kleisli: dependency injection
+
+https://medium.com/@supermanue/real-world-applications-of-scala-kleisli-configuration-ba39e97befec   Real world applications of Scala Kleisli: configuration
+
+
+https://habr.com/ru/companies/wix/articles/304622/ Рефакторинг при помощи композиции Клейсли
+
