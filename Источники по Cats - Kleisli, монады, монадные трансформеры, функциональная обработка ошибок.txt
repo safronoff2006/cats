@@ -1,3 +1,6 @@
+
+==============================================  Стрелки Клейсли =======================================================
+
 https://typelevel.org/cats/datatypes/kleisli.html
 
 https://habr.com/ru/articles/445488/  Монады с точки зрения программистов (и немного теории категорий)
@@ -7,14 +10,13 @@ https://blog.softwaremill.com/kleisli-category-from-theory-to-cats-fbd140bf396e 
 https://github.com/lu4nm3/scala-lessons/blob/master/src/main/scala/_4_functional_programming_monads/lesson4_7_kleisli.md
 
 
-https://sanj.ink/
-
+https://sanj.ink/ Блог индуса
 
 https://github.com/ssanj/kleisli/tree/master/src/main/scala/net/ssanj   Репозиторий индуса
 
 https://sanj.ink/posts/2017-06-07-composing-monadic-functions-with-kleisli-arrows.html Composing Monadic Functions with Kleisli Arrows
 
-
+https://sanj.ink/posts/2017-06-12-reading-configuration-with-kleisli-arrows.html  Reading Configuration with Kleisli Arrows
 
 
 
@@ -27,4 +29,22 @@ https://medium.com/@supermanue/real-world-applications-of-scala-kleisli-configur
 
 
 https://habr.com/ru/companies/wix/articles/304622/ Рефакторинг при помощи композиции Клейсли
+
+
+============================================= Функциональная обработка ошибок =========================================
+
+
+https://sanj.ink/posts/2019-08-18-using-validated-for-error-accumulation-in-scala-with-cats.html  Using Validated for Error Accumulation in Scala with Cats
+
+
+
+
+
+
+=============================================== Arrows =================================================================
+
+
+https://sanj.ink/posts/2017-07-02-working-with-arrows-in-scala.html  Working with Arrows in Scala
+
+
 
