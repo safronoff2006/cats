@@ -1,7 +1,7 @@
 
 
 import cats.Semigroupal
-import cats.implicits.catsSyntaxTuple2Semigroupal
+import cats.syntax.apply._ // for tupled
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -14,7 +14,6 @@ object Main extends App {
   println("Semigroupal and Applicative")
 
   object part1 {
-
     def chapter1 = {
       // Semigroupal and Applicative (Полугрупповой и аппликативный)
 
@@ -315,7 +314,7 @@ object Main extends App {
       // Мы могли бы ожидать, что код вроде следующего сожмет списки,
       // но на самом деле мы получаем декартово произведение их элементов:
 
-      import cats.Semigroupal
+
       import cats.instances.list._ // for Semigroupal
 
       val semList: Seq[(Int, Int)] = Semigroupal[List].product(List(1, 2), List(3, 4))
@@ -461,11 +460,11 @@ object Main extends App {
 
       // Мы также можем записать это, используя tupled сокращенную запись.
 
-      import cats.syntax.apply._ // for tupled
+
       import cats.instances.vector._ // for Semigroup on Vector
 
       println {
-        (error1, error2, error3).tupled
+        (error1 , error2).tupled
         // res1: ErrorOr[(Int, Int)] = Left(Vector("Error 1"))
       }
 
