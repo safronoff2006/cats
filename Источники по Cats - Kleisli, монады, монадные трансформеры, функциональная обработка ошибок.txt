@@ -18,9 +18,6 @@ https://sanj.ink/posts/2017-06-07-composing-monadic-functions-with-kleisli-arrow
 
 https://sanj.ink/posts/2017-06-12-reading-configuration-with-kleisli-arrows.html  Reading Configuration with Kleisli Arrows
 
-
-
-
 https://medium.com/@supermanue/understanding-kleisli-in-scala-9c42ec1a5977 Understanding Kleisli in Scala
 
 https://medium.com/@supermanue/real-world-applications-of-scala-kleisli-dependency-injection-36ef589ee77b  Real world applications of Scala Kleisli: dependency injection
