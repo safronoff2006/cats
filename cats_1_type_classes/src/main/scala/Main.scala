@@ -1,6 +1,6 @@
-import cats._
-import cats.data._
-import cats.syntax.all._
+//import cats._
+//import cats.data._
+//import cats.syntax.all._
 
 object Main extends App {
   println("Hello, World!".toUpperCase)
